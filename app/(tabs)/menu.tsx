@@ -19,13 +19,16 @@ export default function MenuScreen() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchDishes = async () => {
       try {
         const data = await getAllDishes();
         setDishes(data);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error al obtener platos", err);
+        setError("No se pudieron cargar los platos");
       } finally {
         setLoading(false);
       }
@@ -33,6 +36,7 @@ export default function MenuScreen() {
 
     fetchDishes();
   }, []);
+
 
   if (authLoading || loading) {
     return (
@@ -65,6 +69,13 @@ export default function MenuScreen() {
       </TouchableOpacity>
 
       <Text style={styles.header}>Platos disponibles</Text>
+
+      {error && (
+        <Text style={{ color: "red", textAlign: "center", marginVertical: 10 }}>
+          {error}
+        </Text>
+      )}
+
       <FlatList
         data={dishes.filter((d) => d.aviable && d.isActive)}
         renderItem={renderItem}
@@ -73,6 +84,7 @@ export default function MenuScreen() {
       />
     </View>
   );
+
 }
 
 const styles = StyleSheet.create({

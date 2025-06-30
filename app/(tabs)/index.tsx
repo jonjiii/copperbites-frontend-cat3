@@ -31,7 +31,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/menu')}>
             <Text style={styles.gridText}>View the Menu</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/')}>
+          <TouchableOpacity style={styles.gridItem} onPress={() => router.push('/contact')}>
             <Text style={styles.gridText}>Contact Us</Text>
           </TouchableOpacity>
         </View>

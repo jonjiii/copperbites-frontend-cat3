@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API = 'http://localhost:8080/api/users';
+const API = 'http://192.168.1.159:8080/api/users';
 
 export type AuthUser = {
     id: number;
