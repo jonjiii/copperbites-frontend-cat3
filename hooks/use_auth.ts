@@ -11,7 +11,7 @@ export const useAuthRedirect = () => {
     const checkToken = async () => {
       const token = await getToken();
       if (!token) {
-        router.replace('/login'); // Redirige si no hay token
+        router.replace('/login');
       }
       setLoading(false);
     };
