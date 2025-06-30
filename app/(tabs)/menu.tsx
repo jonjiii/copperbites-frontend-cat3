@@ -1,96 +1,74 @@
-import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
 } from "react-native";
-
-const dishes = [
-  {
-    id: "1",
-    name: "Double Angus & Bacon",
-    price: 15,
-    image: require("@/assets/images/baconcheeseburger.webp"),
-  },
-  {
-    id: "2",
-    name: "Spicy Angus Burger",
-    price: 13,
-    image: require("@/assets/images/spicyburger.webp"),
-  },
-  {
-    id: "3",
-    name: "Smokey BBQ Angus",
-    price: 19,
-    image: require("@/assets/images/smokedburger.jpg"),
-  },
-  // Puedes agregar más platillos aquí
-];
-
-const drinks = [
-  {
-    id: "4",
-    name: "Coca Cola",
-    price: 3,
-    image: require("@/assets/images/cocacola.webp"),
-  },
-  {
-    id: "5",
-    name: "Sprite",
-    price: 3,
-    image: require("@/assets/images/sprite.jpg"),
-  },
-  {
-    id: "6",
-    name: "Fanta",
-    price: 3,
-    image: require("@/assets/images/fanta.jpg"),
-  },
-  // Puedes agregar más bebidas aquí
-];
-
-const desserts = [
-  {
-    id: "7",
-    name: "Chocolate Cake",
-    price: 5,
-    image: require("@/assets/images/chocolatecake.jpg"),
-  },
-  // Puedes agregar más postres aquí
-];
+import { useRouter } from "expo-router";
+import { useAuthRedirect } from "@/hooks/use_auth";
+import { removeToken } from "@/services/token_service";
+import { getAllDishes, Dish } from "@/services/dish_service";
 
 export default function MenuScreen() {
+  const { loading: authLoading } = useAuthRedirect();
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const renderItem = ({ item }: { item: any }) => (
+  useEffect(() => {
+    const fetchDishes = async () => {
+      try {
+        const data = await getAllDishes();
+        setDishes(data);
+      } catch (err) {
+        console.error("Error al obtener platos", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDishes();
+  }, []);
+
+  if (authLoading || loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#e74c3c" />
+      </View>
+    );
+  }
+
+  const handleLogout = async () => {
+    await removeToken();
+    router.replace("/login");
+  };
+
+  const renderItem = ({ item }: { item: Dish }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => router.push(`/menu/${item.id}`)}
     >
-      <Image source={item.image} style={styles.image} />
+      <Image source={{ uri: item.image }} style={styles.image} />
       <Text style={styles.title}>{item.name}</Text>
-      <Text style={styles.price}>${item.price}.00</Text>
+      <Text style={styles.price}>${item.price.toFixed(2)}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Special Burgers</Text>
+      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Cerrar sesión</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.header}>Platos disponibles</Text>
       <FlatList
-        data={dishes}
+        data={dishes.filter((d) => d.aviable && d.isActive)}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-      />
-      <Text style={styles.header}>Special Drinks</Text>
-      <FlatList
-        data={drinks}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         numColumns={2}
       />
     </View>
@@ -103,10 +81,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flex: 1,
   },
+  logoutButton: {
+    alignSelf: "flex-end",
+    backgroundColor: "#e74c3c",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   header: {
     fontSize: 22,
     fontWeight: "bold",
-    marginTop: 40,
+    marginTop: 20,
     marginBottom: 15,
     alignSelf: "center",
   },
@@ -122,8 +111,9 @@ const styles = StyleSheet.create({
   image: {
     height: 100,
     width: 150,
-    resizeMode: "contain",
+    resizeMode: "cover",
     marginBottom: 10,
+    borderRadius: 10,
   },
   title: {
     fontWeight: "600",
@@ -135,5 +125,11 @@ const styles = StyleSheet.create({
     color: "#e74c3c",
     fontWeight: "bold",
     marginTop: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
