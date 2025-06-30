@@ -19,3 +19,8 @@ export const getAllDishes = async (): Promise<Dish[]> => {
   const response = await axios.get<{ data: Dish[] }>(API);
   return response.data.data;
 };
+
+export const getDishById = async (id: string | number): Promise<Dish> => {
+  const response = await axios.get<{ data: Dish }>(`${API}/${id}`);
+  return response.data.data;
+};
