@@ -11,13 +11,16 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { getToken } from "@/services/token_service";
+import { createDish } from "@/services/dish_service";
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import Toast from 'react-native-toast-message';
 
 const CLOUD_NAME = "dssczoogn";
 const UPLOAD_PRESET = "cat3_preset";
-const API_URL = "http://192.168.1.159:8080/api/dishes"; // Cambia IP si es necesario
 
 export default function CreateDishScreen() {
+  const router = useRouter();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -25,7 +28,7 @@ export default function CreateDishScreen() {
     name: "",
     description: "",
     price: "",
-    category: "",
+    category: "burger", // valor por defecto
     ingredients: "",
   });
 
@@ -83,42 +86,41 @@ export default function CreateDishScreen() {
 
   const handleSubmit = async () => {
     if (!imageUrl || !form.name || !form.price || !form.category) {
-      return Alert.alert("Faltan datos", "Completa todos los campos obligatorios.");
+      return Toast.show({
+        type: "error",
+        text1: "Campos incompletos",
+        text2: "Por favor completa todos los campos obligatorios.",
+      });
     }
 
-    const token = await getToken();
-
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...form,
-          price: Number(form.price),
-          image: imageUrl,
-        }),
+      await createDish({
+        ...form,
+        price: Number(form.price),
+        image: imageUrl,
       });
 
-      if (response.ok) {
-        Alert.alert("Éxito", "Plato creado correctamente");
-        setForm({
-          name: "",
-          description: "",
-          price: "",
-          category: "",
-          ingredients: "",
-        });
-        setImageUri(null);
-        setImageUrl(null);
-      } else {
-        const error = await response.json();
-        Alert.alert("Error", error.message || "No se pudo crear el plato.");
-      }
-    } catch (err) {
-      Alert.alert("Error", "No se pudo conectar al servidor.");
+      Toast.show({
+        type: "success",
+        text1: "Plato creado",
+        text2: "El nuevo plato fue agregado con éxito 🍽️",
+      });
+
+      setForm({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        ingredients: "",
+      });
+      setImageUri(null);
+      setImageUrl(null);
+    } catch (err: any) {
+      Toast.show({
+        type: "error",
+        text1: "Error al crear",
+        text2: err.message || "No se pudo crear el plato.",
+      });
     }
   };
 
@@ -155,12 +157,23 @@ export default function CreateDishScreen() {
         onChangeText={(text) => setForm({ ...form, price: text })}
         style={styles.input}
       />
-      <TextInput
-        placeholder="Categoría"
-        value={form.category}
-        onChangeText={(text) => setForm({ ...form, category: text })}
-        style={styles.input}
-      />
+
+      {/* 🧃 Categoría con Picker */}
+      <View style={styles.pickerWrapper}>
+        <Text style={styles.label}>Categoría</Text>
+        <Picker
+          selectedValue={form.category}
+          onValueChange={(itemValue) =>
+            setForm({ ...form, category: itemValue })
+          }
+          style={styles.picker}
+        >
+          <Picker.Item label="Hamburguesas" value="burger" />
+          <Picker.Item label="Bebidas" value="drink" />
+          <Picker.Item label="Postres" value="dessert" />
+        </Picker>
+      </View>
+
       <TextInput
         placeholder="Ingredientes (coma separados)"
         value={form.ingredients}
@@ -221,5 +234,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 16,
+  },
+  pickerWrapper: {
+    backgroundColor: "#f2f2f2",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  label: {
+    marginLeft: 10,
+    marginTop: 8,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
   },
 });

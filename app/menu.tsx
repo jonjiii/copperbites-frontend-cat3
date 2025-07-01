@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -9,12 +8,14 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuthRedirect } from "@/hooks/use_auth";
 import { removeToken, getToken } from "@/services/token_service";
 import { getAllDishes, Dish } from "@/services/dish_service";
 import { useFocusEffect } from "@react-navigation/native";
+import Toast from 'react-native-toast-message';
 
 export default function MenuScreen() {
   const { loading: authLoading } = useAuthRedirect();
@@ -61,18 +62,16 @@ export default function MenuScreen() {
     return filteredDishes.filter((d) => d.category.toLowerCase() === category);
   };
 
-  if (authLoading || loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#e74c3c" />
-      </View>
-    );
-  }
-
   const handleLogout = async () => {
     await removeToken();
+    Toast.show({
+      type: "info",
+      text1: "Sesión cerrada",
+      text2: "Nos vemos pronto 👋",
+    });
     router.replace("/login");
-  };
+  }
+
 
   const handleCreate = () => {
     router.push("/create");
@@ -92,6 +91,7 @@ export default function MenuScreen() {
   const renderCategory = (title: string, categoryKey: string) => {
     const items = groupedByCategory(categoryKey);
     if (items.length === 0) return null;
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{title}</Text>
@@ -100,10 +100,19 @@ export default function MenuScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
+          scrollEnabled={false}
         />
       </View>
     );
   };
+
+  if (authLoading || loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#e74c3c" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -232,6 +241,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     marginLeft: 5,
+    color: "#34495e",
   },
   searchInput: {
     marginBottom: 15,

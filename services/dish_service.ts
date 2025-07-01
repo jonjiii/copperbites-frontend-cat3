@@ -1,5 +1,6 @@
 // services/dish_service.ts
 import axios from 'axios';
+import { getToken } from './token_service';
 
 export type Dish = {
   id: number;
@@ -23,8 +24,19 @@ export const getAllDishes = async (): Promise<Dish[]> => {
   return response.data.data;
 };
 
-
 export const getDishById = async (id: string | number): Promise<Dish> => {
   const response = await axios.get<{ data: Dish }>(`${API}/${id}`);
+  return response.data.data;
+};
+
+export const createDish = async (dish: Omit<Dish, "id" | "aviable" | "isActive">): Promise<Dish> => {
+  const token = await getToken();
+
+  const response = await axios.post<{ data: Dish }>(API, dish, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return response.data.data;
 };
