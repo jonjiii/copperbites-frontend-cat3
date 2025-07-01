@@ -21,7 +21,7 @@ export default function ContactScreen() {
   };
 
   const handleBack = () => {
-    router.push("/(tabs)/menu");
+    router.push("/menu");
   };
 
   return (
