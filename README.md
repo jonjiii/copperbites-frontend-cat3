@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+# Copper Bites - App Móvil de Restaurante
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación desarrollada con **React Native + Expo** que permite a los usuarios visualizar, crear y explorar platos de un restaurante. Integra servicios de autenticación, carga de imágenes, consumo de API REST y geolocalización.
 
-## Get started
+## Tecnologías utilizadas
 
-1. Install dependencies
+- **Expo + React Native** (Navegación y UI adaptada a móviles)
+- **React Native Paper + Picker** (Diseño visual consistente)
+- **Axios** (Consumo de API backend)
+- **Cloudinary** (Carga de imágenes)
+- **React Native Maps** (Mapa interactivo)
+- **SecureStore** (Gestión segura de tokens)
+- **Toast Message** (Notificaciones internas)
 
+## Funcionalidades principales
+
+| Criterio                  | Cumplimiento                                                                 |
+|--------------------------|------------------------------------------------------------------------------|
+| **Navegación**           | Fluida y sin errores, gracias a `expo-router` y `Stack.Navigator`           |
+| **Interfaz UI**          | Visual atractivo, diseño responsivo y adaptado a móviles con estilo moderno |
+| **Consumo de API**       | Axios con gestión de tokens (login/register) y consumo de platos            |
+| **Carga de imágenes**    | Integración completa con Cloudinary para subir fotos de platos              |
+| **Mapa interactivo**     | Geolocalización y marcador de dirección con Google Maps API                |
+| **Notificaciones**       | Toasts informativos (crear plato, cerrar sesión, error, éxito, etc.)        |
+| **Visualización**        | Menu clasificado por categoría (hamburguesas, bebidas, postres)             |
+
+## Capturas de pantalla
+
+- Inicio de sesión y registro
+- Vista del menú con filtros y creación de platos
+- Detalle de plato
+- Contacto con mapa
+
+*(Opcional: agrega imágenes si es parte del requerimiento)*
+
+## Instalación y ejecución
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tu-usuario/copper-bites-app.git
+   cd copper-bites-app
+   ```
+
+2. Instala las dependencias:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. Ejecuta el proyecto:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Abre en tu emulador Android/iOS o en la app **Expo Go**.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+> Asegúrate de tener configurado el backend corriendo localmente en el puerto `:8080`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Estructura de carpetas
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+.
+├── app/
+│   ├── menu.tsx                # Visualización de platos por categoría
+│   ├── create.tsx              # Formulario para crear nuevo plato
+│   ├── contact.tsx             # Mapa con ubicación
+│   ├── login.tsx / signup.tsx  # Autenticación
+│   └── (tabs)/index.tsx        # Home inicial
+├── services/                   # Lógica de negocio (auth, platos, tokens)
+├── components/                 # Componentes visuales reutilizables
+└── assets/                     # Imágenes y fuentes
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Estado del desarrollo
 
-## Learn more
+- [x] Login y registro funcional
+- [x] Token almacenado con `SecureStore`
+- [x] Creación de platos (con imagen)
+- [x] Visualización por categoría
+- [x] Mapa funcional
+- [x] Notificaciones visibles con Toasts
+- [x] Carga de imágenes a Cloudinary
 
-To learn more about developing your project with Expo, look at the following resources:
+## Autor
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Johann Lizana — [UCN - Ingeniería en Computación e Informática]
