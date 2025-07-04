@@ -16,12 +16,14 @@ import { removeToken, getToken } from "@/services/token_service";
 import { getAllDishes, Dish } from "@/services/dish_service";
 import { useFocusEffect } from "@react-navigation/native";
 import Toast from 'react-native-toast-message';
+import { getCart } from "@/services/cart_service";
 
 export default function MenuScreen() {
   const { loading: authLoading } = useAuthRedirect();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -32,6 +34,8 @@ export default function MenuScreen() {
         try {
           const data = await getAllDishes();
           setDishes(data);
+          const cart = await getCart();
+          setCartCount(cart.length);
         } catch (err) {
           console.error("Error al obtener platos", err);
         } finally {
@@ -145,6 +149,14 @@ export default function MenuScreen() {
           <Text style={styles.createButtonText}>Crear nuevo plato</Text>
         </TouchableOpacity>
       )}
+
+      <TouchableOpacity
+        style={styles.cartButton}
+        onPress={() => router.push("/cart")}
+      >
+        <Text style={styles.cartButtonText}>🛒 Ver carrito ({cartCount})</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -251,4 +263,20 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderWidth: 1,
   },
+  cartButton: {
+    position: "absolute",
+    bottom: 90,
+    right: 20,
+    backgroundColor: "#3498db",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    elevation: 5,
+  },
+  cartButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+
 });
